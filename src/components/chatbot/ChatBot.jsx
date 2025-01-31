@@ -6,13 +6,11 @@ import "./ChatBot.css";
 
 // Constants
 const CHATS_STORAGE_KEY = "saved_chats";
-<<<<<<< HEAD
-const API_ENDPOINT = "http://localhost:7070/generate";
-const CURRENT_CHAT_KEY = "current_chat"; // Key for storing the active chat ID
-=======
+
+
 const API_ENDPOINT = "https://chatbotapi-myqe.onrender.com/generate";
 const CURRENT_CHAT_KEY = "current_chat"; 
->>>>>>> 77b3c0f (project setup)
+
 
 const generateChatId = () => `chat_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
@@ -87,6 +85,7 @@ const MessageContent = ({ message }) => {
 };
 
 // Drawer Component
+// eslint-disable-next-line react/prop-types
 const ChatDrawer = ({ chats, currentChatId, onNewChat, onSwitchChat, onDeleteChat, onClose, isOpen }) => (
   <>
     {isOpen && <div className="drawer-backdrop" onClick={onClose} />}
