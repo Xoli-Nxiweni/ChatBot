@@ -4,9 +4,3 @@
   box-sizing: border-box;
 }
 
-git init
-git add .
-git commit -m "project setup"
-git branch -M main
-git remote add origin https://github.com/Xoli-Nxiweni/ChatBot.git
-git push -u origin main
