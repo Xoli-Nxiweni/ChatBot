@@ -9,8 +9,8 @@ import PropTypes from "prop-types";
 const CHATS_STORAGE_KEY = "saved_chats";
 
 
-// const API_ENDPOINT = "https://chatbotapi-myqe.onrender.com/generate";
-const API_ENDPOINT = "http://localhost:7070/generate";
+const API_ENDPOINT = "https://chatbotapi-myqe.onrender.com/generate";
+// const API_ENDPOINT = "http://localhost:7070/generate";
 const CURRENT_CHAT_KEY = "current_chat"; 
 
 
