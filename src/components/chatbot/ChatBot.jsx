@@ -3,12 +3,14 @@ import { marked } from "marked";
 import DOMPurify from "dompurify";
 import { formatResponse, formatTypes } from "./responseFormatter";
 import "./ChatBot.css";
+import PropTypes from "prop-types";
 
 // Constants
 const CHATS_STORAGE_KEY = "saved_chats";
 
 
-const API_ENDPOINT = "https://chatbotapi-myqe.onrender.com/generate";
+// const API_ENDPOINT = "https://chatbotapi-myqe.onrender.com/generate";
+const API_ENDPOINT = "http://localhost:7070/generate";
 const CURRENT_CHAT_KEY = "current_chat"; 
 
 
@@ -36,6 +38,8 @@ const BOT_PERSONALITY = {
 };
 
 // Message Content Component
+// Format *text* as bold in MessageContent
+// Add PropTypes for message validation
 const MessageContent = ({ message }) => {
   const formatted = formatResponse(message.text);
 
@@ -49,7 +53,7 @@ const MessageContent = ({ message }) => {
 
   switch (formatted.type) {
     case formatTypes.BOLD:
-      return <div className="message-content bold">{formatted.content}</div>;
+      return <div className="message-content bold" dangerouslySetInnerHTML={{ __html: formatted.content }} />;
     case formatTypes.CODE:
       return (
         <div className="message-content code">
@@ -80,8 +84,15 @@ const MessageContent = ({ message }) => {
         </div>
       );
     default:
-      return <div className="message-content normal">{formatted.content}</div>;
+      return <div className="message-content normal" dangerouslySetInnerHTML={{ __html: formatted.content }} />;
   }
+};
+MessageContent.propTypes = {
+  message: PropTypes.shape({
+    text: PropTypes.string.isRequired,
+    type: PropTypes.string,
+    timestamp: PropTypes.string,
+  }).isRequired,
 };
 
 // Drawer Component
@@ -143,8 +154,65 @@ const Chatbot = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [error, setError] = useState(null);
 
+  const [typingText, setTypingText] = useState(""); // Typing effect state
+  const typingTimeoutRef = useRef(null);
+
   const chatBoxRef = useRef(null);
   const inputRef = useRef(null);
+  const matrixCanvasRef = useRef(null);
+
+  // Matrix rain effect
+  useEffect(() => {
+    const canvas = matrixCanvasRef.current;
+    if (!canvas) return;
+    let animationFrameId;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    const ctx = canvas.getContext("2d");
+
+    function setCanvasSize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    setCanvasSize();
+
+    // Characters for the rain
+    const letters = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴabcdefghijklmnopqrstuvwxyz0123456789";
+    const fontSize = 18;
+    let columns = Math.floor(width / fontSize);
+    let drops = Array(columns).fill(1);
+
+    function draw() {
+      ctx.fillStyle = "rgba(0,0,0,0.15)";
+      ctx.fillRect(0, 0, width, height);
+      ctx.font = `${fontSize}px 'Orbitron', 'Inter', monospace`;
+      ctx.fillStyle = "rgba(0,230,216,0.18)";
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+      animationFrameId = requestAnimationFrame(draw);
+    }
+
+    draw();
+    // Handle resize
+    const handleResize = () => {
+      setCanvasSize();
+      columns = Math.floor(width / fontSize);
+      drops = Array(columns).fill(1);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   // Auto-save chats
   useEffect(() => {
@@ -160,7 +228,7 @@ const Chatbot = () => {
     localStorage.setItem(CURRENT_CHAT_KEY, currentChatId);
   }, [currentChatId]);
 
-  // Auto-scroll
+  // Auto-scroll (also scrolls on typing effect)
   useEffect(() => {
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTo({
@@ -168,7 +236,7 @@ const Chatbot = () => {
         behavior: "smooth",
       });
     }
-  }, [chats[currentChatId]?.messages]);
+  }, [currentChatId, chats, typingText]);
 
   // Create new chat
   const createNewChat = () => {
@@ -204,6 +272,44 @@ const Chatbot = () => {
 
       return newChats;
     });
+  };
+
+  // Typing effect for AI response
+  const typeResponse = (fullText) => {
+    setTypingText("");
+    let i = 0;
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    const typeNext = () => {
+      setTypingText((prev) => prev + fullText[i]);
+      i++;
+      if (i < fullText.length) {
+        typingTimeoutRef.current = setTimeout(typeNext, 15); // typing speed
+        // Scroll chat to bottom as it types
+        if (chatBoxRef.current) {
+          chatBoxRef.current.scrollTo({
+            top: chatBoxRef.current.scrollHeight,
+            behavior: "smooth",
+          });
+        }
+      } else {
+        setTypingText("");
+        setChats((prev) => ({
+          ...prev,
+          [currentChatId]: {
+            ...prev[currentChatId],
+            messages: [
+              ...prev[currentChatId].messages,
+              {
+                type: "bot",
+                text: fullText,
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          },
+        }));
+      }
+    };
+    typeNext();
   };
 
   // Send message
@@ -246,21 +352,9 @@ const Chatbot = () => {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
-
-      setChats((prev) => ({
-        ...prev,
-        [currentChatId]: {
-          ...prev[currentChatId],
-          messages: [
-            ...prev[currentChatId].messages,
-            {
-              type: "bot",
-              text: data.response,
-              timestamp: new Date().toISOString(),
-            }
-          ],
-        }
-      }));
+      // Use typing effect for AI response
+      typeResponse(data.response);
+      return;
     } catch (error) {
       console.error("API error:", error);
       setError("Connection error - please try again");
@@ -279,6 +373,7 @@ const Chatbot = () => {
 
   return (
     <div className="app-container">
+      {/* Remove Matrix rain background and wrapper, restore original chat UI structure */}
       <button
         className="menu-button"
         onClick={() => setIsDrawerOpen(true)}
@@ -306,20 +401,31 @@ const Chatbot = () => {
         </header>
 
         <div className="chat-area">
-          <div className="message-container" ref={chatBoxRef}>
-            {chats[currentChatId]?.messages.map((message, index) => (
-              <div key={`${message.timestamp}-${message.type}`} className={`message ${message.type}`}>
-                <MessageContent message={message} />
-                <div className="message-time">{formatTimestamp(message.timestamp)}</div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="message bot">
-                <div className="typing-indicator">
-                  <span></span><span></span><span></span>
+          <div className="message-area-matrix-bg">
+            {/* Matrix rain background only behind the message container */}
+            <canvas ref={matrixCanvasRef} className="matrix-canvas" aria-hidden="true" tabIndex={-1} />
+            <div className="message-container" ref={chatBoxRef}>
+              {chats[currentChatId]?.messages.map((message) => (
+                <div key={`${message.timestamp}-${message.type}`} className={`message ${message.type}`}>
+                  <MessageContent message={message} />
+                  <div className="message-time">{formatTimestamp(message.timestamp)}</div>
                 </div>
-              </div>
-            )}
+              ))}
+              {/* Typing effect for AI */}
+              {typingText && (
+                <div className="message bot">
+                  <MessageContent message={{ type: "bot", text: typingText }} />
+                  <div className="message-time">...</div>
+                </div>
+              )}
+              {isLoading && !typingText && (
+                <div className="message bot">
+                  <div className="typing-indicator">
+                    <span></span><span></span><span></span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="input-container">

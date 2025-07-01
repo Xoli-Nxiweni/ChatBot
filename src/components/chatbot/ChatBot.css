@@ -1,3 +1,6 @@
+/* Add Orbitron font for web3 neon/futuristic look */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
+
 /* Reset and Base Styles */
 * {
   box-sizing: border-box;
@@ -8,50 +11,45 @@
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0a0a0a;
-  color: #fff;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #111112 0%, #18181b 60%, #23232b 100%);
+  color: #f5f5f7;
+  min-height: 100vh;
+  background-size: unset;
+  animation: none;
 }
 
-/* Layout Components */
-.app-container {
-  position: relative;
-  height: 100vh;
-  display: flex;
-}
-
+/* Remove excessive glowing and neon, keep subtle accents */
 .chat-container {
   position: unset;
   /* flex: 1; */
   display: flex;
   flex-direction: column;
-  background: #1a1a1a;
-  border-radius: 24px;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  margin: 20px 75px;
-  height: calc(100vh - 35px);
+  background: linear-gradient(135deg, rgba(24,24,27,0.98) 60%, rgba(35,35,43,0.98) 100%);
+  border-radius: 28px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.7);
+  border: 1.5px solid #23232b;
 }
 
 /* Header Styles */
 .chat-header {
   padding: 20px 24px;
-  background: linear-gradient(135deg, #6d5dfc, #4b3ff2);
+  background: linear-gradient(90deg, #000 60%, #23232b 100%);
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-bottom: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .chat-header h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #fff;
-  letter-spacing: -0.25px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #00e6d8;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px #000a;
+  font-family: 'Orbitron', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  text-transform: uppercase;
 }
 
 .error-message {
@@ -69,15 +67,41 @@ body {
   flex-direction: column;
   background: #1a1a1a;
   overflow: hidden;
+  position: relative;
+}
+
+.message-area-matrix-bg {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.matrix-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background: transparent;
+  display: block;
 }
 
 .message-container {
+  position: relative;
+  z-index: 1;
   flex: 1;
-  padding: 16px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
+  background: transparent;
+  padding: 16px; /* Restore padding for spacing */
 }
 
 /* Message Styles */
@@ -107,25 +131,32 @@ body {
   /* position: relative; */
   word-break: break-word;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  white-space: pre-wrap;
 }
 
 .message.user .message-content {
-  background: linear-gradient(135deg, #6d5dfc, #4b3ff2);
-  color: #fff;
+  background: linear-gradient(135deg, #23232b 60%, #111112 100%);
+  color: #f5f5f7;
   border-radius: 20px 20px 4px 20px;
+  border: 1.5px solid #23232b;
+  box-shadow: 0 2px 8px #000a;
 }
 
 .message.bot .message-content {
-  background: #2d2d2d;
-  color: #fff;
+  background: linear-gradient(135deg, #000 60%, #23232b 100%);
+  color: #00e6d8;
   border-radius: 20px 20px 20px 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1.5px solid #00e6d8;
+  box-shadow: 0 2px 12px #00e6d833;
+  text-shadow: none;
 }
 
 .message-time {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.5);
   margin-top: 4px;
+  color: #00e6d8;
+  text-shadow: none;
 }
 
 /* Input Area */
@@ -133,25 +164,29 @@ body {
   padding: 16px;
   display: flex;
   gap: 12px;
-  background: #1a1a1a;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: #18181b;
+  border-top: 1.5px solid #23232b;
+  position: relative;
+  z-index: 2;
 }
 
 .input-container input {
   flex: 1;
   padding: 14px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1.5px solid #23232b;
   border-radius: 16px;
   font-size: 15px;
   outline: none;
   transition: all 0.2s ease;
-  background: #2d2d2d;
-  color: #fff;
+  background: #23232b;
+  color: #f5f5f7;
+  font-family: 'Orbitron', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 1px;
 }
 
 .input-container input:focus {
-  border-color: #6d5dfc;
-  box-shadow: 0 0 0 3px rgba(109, 93, 252, 0.2);
+  border-color: #00e6d8;
+  box-shadow: 0 0 0 3px #00e6d822;
 }
 
 .input-container input:disabled {
@@ -163,10 +198,15 @@ body {
 .send-button {
   padding: 14px;
   width: 50px;
-  background: linear-gradient(135deg, #6d5dfc, #4b3ff2);
-  color: #fff;
-  border: none;
+  background: linear-gradient(135deg, #00e6d8 60%, #23232b 100%);
+  color: #111112;
   border-radius: 16px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px #00e6d822;
+  border: 1.5px solid #00e6d8;
+  text-shadow: none;
+  font-family: 'Orbitron', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -175,8 +215,9 @@ body {
 }
 
 .send-button:hover {
-  background: linear-gradient(135deg, #4b3ff2, #6d5dfc);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #23232b 60%, #00e6d8 100%);
+  color: #00e6d8;
+  box-shadow: 0 2px 12px #00e6d8cc;
 }
 
 .send-button:disabled {
@@ -190,8 +231,10 @@ body {
   position: absolute;
   top: 20px;
   left: 20px;
-  background: #2d2d2d;
-  border: none;
+  background: #23232b;
+  color: #00e6d8;
+  border: 1.5px solid #00e6d8;
+  box-shadow: none;
   border-radius: 50%;
   width: 48px;
   height: 48px;
@@ -204,7 +247,9 @@ body {
 }
 
 .menu-button:hover {
-  background: #3d3d3d;
+  background: #00e6d8;
+  color: #23232b;
+  box-shadow: none;
 }
 
 .drawer-backdrop {
@@ -224,8 +269,9 @@ body {
   left: -300px;
   height: 100%;
   width: 300px;
-  background: #2d2d2d;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: #18181b;
+  border-right: 1.5px solid #23232b;
+  box-shadow: none;
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 950;
   overflow-y: auto;
@@ -237,16 +283,21 @@ body {
 
 .drawer-header {
   padding: 24px;
-  background: linear-gradient(135deg, #6d5dfc, #4b3ff2);
+  background: linear-gradient(90deg, #000 60%, #23232b 100%);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: none;
 }
 
 .drawer-header h2 {
   margin: 0;
   font-size: 20px;
-  color: #fff;
+  color: #00e6d8;
+  font-weight: 800;
+  font-family: 'Orbitron', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px #000a;
 }
 
 .drawer-content {
@@ -257,20 +308,22 @@ body {
 .new-chat-button {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #6d5dfc, #4b3ff2);
-  color: #fff;
-  border: none;
-  border-radius: 16px;
-  font-size: 15px;
-  font-weight: 600;
+  background: linear-gradient(135deg, #00e6d8 60%, #23232b 100%);
+  color: #111112;
+  font-weight: 700;
+  border: 1.5px solid #00e6d8;
+  box-shadow: 0 2px 8px #00e6d822;
+  font-family: 'Orbitron', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 1px;
   cursor: pointer;
   margin-bottom: 20px;
   transition: all 0.2s ease;
 }
 
 .new-chat-button:hover {
-  background: linear-gradient(135deg, #4b3ff2, #6d5dfc);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #23232b 60%, #00e6d8 100%);
+  color: #00e6d8;
+  box-shadow: 0 2px 12px #00e6d8cc;
 }
 
 .chats-list {
@@ -295,7 +348,9 @@ body {
 }
 
 .chat-item.active {
-  background: rgba(109, 93, 252, 0.2);
+  background: #00e6d822;
+  border: none;
+  box-shadow: none;
 }
 
 .chat-title {
@@ -318,7 +373,8 @@ body {
 
 .delete-chat-button:hover {
   color: #ff4444;
-  background: rgba(255, 68, 68, 0.1);
+  background: #23232b;
+  box-shadow: none;
 }
 
 /* Loading Indicators */
@@ -326,9 +382,10 @@ body {
   width: 20px;
   height: 20px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border-top-color: #00e6d8;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+  box-shadow: none;
 }
 
 .typing-indicator {
@@ -340,9 +397,11 @@ body {
 .typing-indicator span {
   width: 8px;
   height: 8px;
-  background: rgba(255, 255, 255, 0.5);
+  background: #00e6d8;
   border-radius: 50%;
   animation: bounce 0.8s infinite;
+  background: #00e6d8;
+  box-shadow: none;
 }
 
 .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
@@ -380,7 +439,7 @@ body {
 }
 
 .message-container::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: #23232b;
   border-radius: 4px;
 }
 
@@ -419,42 +478,41 @@ body {
 }
 
 /* responseFormatter.css */
-.message-content {
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
 /* Bold format */
 .message-content.bold {
-  font-weight: 700;
-  color: #2563eb;
+  font-weight: 800;
+  color: #00e6d8;
+  text-shadow: 0 1px 4px #00e6d855;
+  letter-spacing: 1px;
+  font-family: 'Orbitron', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Code format */
 .message-content.code {
-  font-family: 'Fira Code', monospace;
-  background: #1e1e1e;
-  color: #d4d4d4;
-  padding: 1rem;
-  border-radius: 8px;
-  overflow-x: auto;
+  font-family: 'Fira Code', 'Orbitron', monospace;
+  background: #18181b;
+  color: #f5f5f7;
+  border: 1.5px solid #23232b;
+  box-shadow: 0 2px 8px #000a;
 }
 
 .code-header {
-  background: #2d2d2d;
-  color: #fff;
-  padding: 0.5rem 1rem;
+  background: #23232b;
+  color: #00e6d8;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-family: 'Orbitron', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* README format */
 .message-content.readme {
-  background: #f8fafc;
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  background: #18181b;
+  color: #f5f5f7;
+  border: 1.5px solid #23232b;
+  box-shadow: none;
 }
 
 .readme h1 {
@@ -480,11 +538,15 @@ body {
 /* chatBot.css */
 
 .message-time {
-  font-size: 0.75rem;
-  color: #64748b;
-  margin-left: 1rem;
+  color: #00e6d8;
+  text-shadow: none;
 }
 
 .input-container input:focus {
-  border-color: #2563eb;
+  border-color: #00e6d8;
+}
+
+/* Force font-family 'Orbitron', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif on all chat UI elements for full font consistency */
+body, .chat-container, .chat-header, .chat-area, .message, .message-content, .input-container input, .send-button, .drawer-header h2, .new-chat-button, .chat-item, .code-header, .message-content.bold, .message-content.code, .message-content.readme, .message-content.list, .list-item {
+  font-family: 'Orbitron', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
